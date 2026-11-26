@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>山田 太郎 | ゲームプログラマー志望 ポートフォリオ</title>
+  <meta name="description" content="ゲームプログラマー志望・山田太郎のWeb名刺兼ポートフォリオ">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ===== 1. ヘッダー / プロフィール ===== -->
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="hero-text">
+        <p class="eyebrow">PORTFOLIO</p>
+        <h1 class="name">[自分の名前 / ローマ字]</h1>
+        <p class="role">ゲームプログラマー志望（4年制専門学校 2年次）</p>
+        <p class="pitch">手触りの良さと拡張しやすい設計の両立を目指し、Unity（C#）での3D数学を用いたアクション制御から、C++ / DirectX 12による低レイヤーの描画パイプライン構築まで原理から実装しています。</p>
+        <div class="links">
+          <a class="hero-cta" href="#works">制作したゲーム一覧（WORKS） ↓</a>
+          <a class="icon-link" href="[自分のGitHub URL]" target="_blank" rel="noopener" aria-label="GitHub">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.38 7.86 10.9.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.54-3.87-1.54-.52-1.33-1.28-1.69-1.28-1.69-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.03 1.76 2.69 1.25 3.35.96.1-.74.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.28 1.18-3.09-.12-.29-.51-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.62 1.59.23 2.76.11 3.05.74.81 1.18 1.83 1.18 3.09 0 4.42-2.69 5.39-5.25 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z"/></svg>
+            <span>GitHub</span>
+          </a>
+          <a class="icon-link" href="[自分のX URL（不要ならボタンごと削除）]" target="_blank" rel="noopener" aria-label="X">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            <span>[自分のXのID（不要ならボタンごと削除）]</span>
+          </a>
+        </div>
+      </div>
+
+      <aside class="skill-stack" aria-label="Skill Stack">
+        <h2 class="skill-title">SKILL STACK</h2>
+        <ul class="skill-list">
+          <li><span class="skill-name">Unity</span><span class="skill-sub">WebGL / 3D・2D</span></li>
+          <li><span class="skill-name">C#</span><span class="skill-sub">ゲームロジック・ツール</span></li>
+          <li><span class="skill-name">C++</span><span class="skill-sub">アルゴリズム・設計</span></li>
+          <li><span class="skill-name">DirectX 12</span><span class="skill-sub">レンダリング基礎</span></li>
+          <li><span class="skill-name">Git</span><span class="skill-sub">チーム開発</span></li>
+        </ul>
+      </aside>
+    </div>
+  </header>
+
+  <main>
+    <!-- ===== 2. プレイ・詳細エリア（遅延表示：作品選択時に展開） ===== -->
+    <section class="section" id="play" hidden>
+      <div class="section-head">
+        <h2 class="section-title">PLAY &amp; DETAIL <small id="playTitle">作品詳細・プレイ</small></h2>
+        <button type="button" class="btn-secondary" id="closePlayBtn">✕ 閉じる</button>
+      </div>
+
+      <div class="play-stage">
+        <!-- PC + WebGLあり: WebGL(iframeはscript.jsで展開時のみ生成) -->
+        <div class="game-frame" id="gameFrame"></div>
+
+        <!-- スマホ + WebGLあり: 動画 + 案内バッジ -->
+        <div class="mobile-demo" id="mobileDemo">
+          <span class="badge">🖥 PCブラウザからアクセスすると実際に遊べます</span>
+          <video src="./assets/demo.mp4" controls muted playsinline preload="metadata"></video>
+          <p class="note">30秒プレイ動画</p>
+        </div>
+
+        <!-- WebGLなし（画像・動画のみの作品）: 16:9メディア表示 -->
+        <div class="detail-media" id="detailMedia" hidden></div>
+
+        <!-- 操作方法（WebGLありの作品のみ表示） -->
+        <div class="controls-guide" id="controlsGuide">
+          <h3>操作方法</h3>
+          <div class="controls-grid">
+            <div>
+              <h4>⌨ キーボード</h4>
+              <ul>
+                <li><kbd>WASD</kbd><kbd>矢印キー</kbd> 移動</li>
+                <li><kbd>Space</kbd> 決定・アクション</li>
+                <li><kbd>R</kbd> リセット</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 選択中作品の技術解説パネル -->
+      <div class="detail-panel" id="detailPanel">
+        <div class="block block-desc" id="detailIntro">
+          <p class="block-text" id="detailDescription"></p>
+          <div class="tags" id="detailTags"></div>
+        </div>
+        <div class="block block-role">
+          <h3 class="block-label">担当箇所</h3>
+          <p class="block-text" id="detailRole"></p>
+        </div>
+        <div class="block block-arch">
+          <h3 class="block-label">担当箇所の解説</h3>
+          <p class="block-text" id="detailArchitecture"></p>
+        </div>
+      </div>
+
+      <!-- その他の作品（展開中のみ表示） -->
+      <div class="other-works" id="otherWorksSection" hidden>
+        <h3 class="other-works-title">その他の作品</h3>
+        <div class="other-works-row" id="otherWorksRow"></div>
+      </div>
+    </section>
+
+    <!-- ===== 3. 作品詳細 ===== -->
+    <section class="section" id="works">
+      <div class="section-head">
+        <h2 class="section-title">WORKS <small>作品詳細・技術アピール</small></h2>
+        <button type="button" class="btn-primary admin-only" id="addWorkBtn" hidden>＋ 作品を追加</button>
+      </div>
+      <div class="tag-filter" id="tagFilter" role="group" aria-label="技術タグで絞り込み"></div>
+      <div class="works-grid" id="worksGrid"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>
+      &copy; <span id="year"></span> Taro Yamada
+      <span class="footer-sep">·</span>
+      <button type="button" class="admin-link" id="adminTrigger">Admin</button>
+      <button type="button" class="admin-link admin-only" id="logoutBtn" hidden>ログアウト</button>
+    </p>
+  </footer>
+
+  <!-- ===== 管理者ログインモーダル ===== -->
+  <div class="modal-backdrop" id="loginModal" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="loginModalTitle">
+      <div class="modal-head">
+        <h3 id="loginModalTitle">管理者ログイン</h3>
+        <button type="button" class="modal-close" data-close="loginModal" aria-label="閉じる">&times;</button>
+      </div>
+      <form id="loginForm" class="modal-form">
+        <label class="field">
+          <span>メールアドレス</span>
+          <input type="email" id="loginEmail" required autocomplete="email" placeholder="admin@example.com">
+        </label>
+        <label class="field">
+          <span>パスワード</span>
+          <input type="password" id="loginPassword" required autocomplete="current-password" placeholder="••••••••">
+        </label>
+        <p class="form-msg" id="loginMsg" role="alert"></p>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" data-close="loginModal">キャンセル</button>
+          <button type="submit" class="btn-primary" id="loginSubmit">ログイン</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== 作品追加・編集モーダル ===== -->
+  <div class="modal-backdrop" id="workModal" hidden>
+    <div class="modal modal-lg" role="dialog" aria-modal="true" aria-labelledby="workModalTitle">
+      <div class="modal-head">
+        <h3 id="workModalTitle">作品を追加</h3>
+        <button type="button" class="modal-close" data-close="workModal" aria-label="閉じる">&times;</button>
+      </div>
+      <form id="workForm" class="modal-form">
+        <input type="hidden" id="workId">
+        <label class="field">
+          <span>作品タイトル <em class="req">*</em></span>
+          <input type="text" id="workTitle" required placeholder="例: 3Dアクションゲーム">
+        </label>
+        <div class="field">
+          <span>メディアファイル（画像 .png/.jpg または動画 .mp4）</span>
+          <input type="file" id="workMediaFile" accept="image/*,video/mp4,video/webm">
+          <input type="text" id="workMediaUrl" placeholder="または既存の画像/動画URL・相対パス（例: ./assets/work1.png）">
+          <small class="field-hint">ファイルを選択すると Supabase Storage へ自動アップロードされます。編集時に空のままにすると現在のメディアを維持します。</small>
+        </div>
+        <label class="field">
+          <span>（任意）WebGLプレイ用URL</span>
+          <input type="text" id="workWebglUrl" placeholder="例: ./webgl/index.html または https://...">
+          <small class="field-hint">入力するとカードに「PLAYエリアで遊ぶ」ボタンが表示されます。</small>
+        </label>
+        <label class="field">
+          <span>ゲームの説明</span>
+          <textarea id="workDescription" rows="4" placeholder="どんなゲームか、遊びのコンセプトなど"></textarea>
+        </label>
+        <label class="field">
+          <span>担当箇所（制作体制・期間・担当パート） <em class="req">*</em></span>
+          <textarea id="workRole" rows="4" required placeholder="例: 2年次 チーム制作（メインプログラマー）&#10;担当: プレイヤー制御・コアシステム"></textarea>
+        </label>
+        <label class="field">
+          <span>担当箇所の解説（設計・アルゴリズム・工夫したポイント） <em class="req">*</em></span>
+          <textarea id="workArchitecture" rows="10" required placeholder="クラス分割、データ駆動設計、数学的処理などの技術アピール"></textarea>
+        </label>
+        <label class="field">
+          <span>（任意）使用技術タグ（カンマ区切り）</span>
+          <input type="text" id="workTags" placeholder="例: Unity 6, C#, Input System, UniTask">
+        </label>
+        <p class="form-msg" id="workMsg" role="alert"></p>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" data-close="workModal">キャンセル</button>
+          <button type="submit" class="btn-primary" id="workSubmit">保存する</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="script.js"></script>
+</body>
+</html>
