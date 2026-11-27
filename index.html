@@ -87,6 +87,7 @@
       <!-- 選択中作品の技術解説パネル -->
       <div class="detail-panel" id="detailPanel">
         <div class="block block-desc" id="detailIntro">
+          <p class="detail-period" id="detailPeriod" hidden></p>
           <p class="block-text" id="detailDescription"></p>
           <div class="tags" id="detailTags"></div>
         </div>
@@ -114,7 +115,7 @@
         <button type="button" class="btn-primary admin-only" id="addWorkBtn" hidden>＋ 作品を追加</button>
       </div>
       <div class="tag-filter" id="tagFilter" role="group" aria-label="技術タグで絞り込み"></div>
-      <div class="works-grid" id="worksGrid"></div>
+      <div class="works-sections" id="worksSections"></div>
     </section>
   </main>
 
@@ -165,6 +166,20 @@
           <span>作品タイトル <em class="req">*</em></span>
           <input type="text" id="workTitle" required placeholder="例: 3Dアクションゲーム">
         </label>
+        <div class="field-row">
+          <label class="field">
+            <span>表示カテゴリ <em class="req">*</em></span>
+            <select id="workCategory" required>
+              <option value="main">Main Projects（代表作・主力作品）</option>
+              <option value="tech_demo">Tech Demos / Mechanics（技術検証・単機能実装）</option>
+              <option value="rapid">Rapid Prototypes / 1-Week Games（短期制作）</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>制作期間・体制</span>
+            <input type="text" id="workDevPeriod" placeholder="例: 2週間 / チーム制作、7日 / 個人制作">
+          </label>
+        </div>
         <div class="field">
           <span>メディアファイル（画像 .png/.jpg または動画 .mp4）</span>
           <input type="file" id="workMediaFile" accept="image/*,video/mp4,video/webm">

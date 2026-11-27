@@ -14,6 +14,8 @@ const WEBGL_PATH = "./webgl/index.html";
 const worksData = [
   {
     title: "[チーム制作のゲームタイトル]",
+    category: "main",
+    dev_period: "3ヶ月 / チーム制作",
     media: "./assets/work1.png",
     webgl_url: "",
     description:
@@ -25,6 +27,8 @@ const worksData = [
   },
   {
     title: "[2Dパズルゲームのタイトル]",
+    category: "rapid",
+    dev_period: "1週間 / 個人制作",
     media: "./assets/work2.png",
     webgl_url: "",
     description:
@@ -36,6 +40,8 @@ const worksData = [
   },
   {
     title: "【Tech Demo】3Dベクトル演算による敵ロックオン制御",
+    category: "tech_demo",
+    dev_period: "3日 / 個人実装",
     media: "./assets/tech1.mp4",
     webgl_url: "",
     description:
@@ -47,6 +53,8 @@ const worksData = [
   },
   {
     title: "【Tech Demo】C++ / DirectX 12 基礎描画パイプライン",
+    category: "tech_demo",
+    dev_period: "継続学習 / 個人実装",
     media: "./assets/tech2.png",
     webgl_url: "",
     description:
@@ -56,6 +64,12 @@ const worksData = [
     architecture:
       "エンジン内部の描画仕組みを低レイヤーから理解するため、DirectX 12のレンダリングパイプラインをゼロから構築。頂点バッファ生成、HLSLシェーダーコンパイル、PSO設定などGPU制御フローを検証しながら実装しています。",
   },
+];
+
+const CATEGORIES = [
+  { key: "main", title: "Main Projects", sub: "代表作・主力作品", compact: false },
+  { key: "tech_demo", title: "Tech Demos / Mechanics", sub: "技術検証・単機能実装", compact: true },
+  { key: "rapid", title: "Rapid Prototypes / 1-Week Games", sub: "短期制作", compact: true },
 ];
 
 /* ---------- 以下は基本的に編集不要 ---------- */
@@ -208,9 +222,12 @@ function openPlayArea(work) {
   document.getElementById("playTitle").textContent = work.title || "作品詳細・プレイ";
 
   // 詳細パネルへテキスト・タグを反映
+  const periodEl = document.getElementById("detailPeriod");
   const descEl = document.getElementById("detailDescription");
   const tagsEl = document.getElementById("detailTags");
   const introEl = document.getElementById("detailIntro");
+  periodEl.textContent = work.dev_period || "";
+  periodEl.hidden = !work.dev_period;
   descEl.textContent = work.description || "";
   descEl.hidden = !work.description;
   tagsEl.innerHTML = "";
@@ -219,7 +236,7 @@ function openPlayArea(work) {
     work.tags.forEach((t) => tagsEl.appendChild(el("span", "tag", t)));
   }
   tagsEl.hidden = !hasTags;
-  introEl.hidden = !work.description && !hasTags;
+  introEl.hidden = !work.dev_period && !work.description && !hasTags;
 
   document.getElementById("detailRole").textContent = work.role || "";
   document.getElementById("detailArchitecture").textContent = work.architecture || "";
@@ -355,9 +372,124 @@ function renderTagFilter() {
   tags.forEach((t) => container.appendChild(makeBtn(t, t)));
 }
 
+function normalizeCategory(cat) {
+  return CATEGORIES.some((c) => c.key === cat) ? cat : "main";
+}
+
+function buildAdminBar(w) {
+  const bar = el("div", "card-admin-bar");
+  const editBtn = el("button", "btn-secondary", "編集");
+  editBtn.type = "button";
+  editBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    openWorkModal(w);
+  });
+
+  const delBtn = el("button", "btn-danger", "削除");
+  delBtn.type = "button";
+  delBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    deleteWork(w);
+  });
+
+  bar.appendChild(editBtn);
+  bar.appendChild(delBtn);
+  return bar;
+}
+
+function buildMainCard(w, isAdmin) {
+  const card = el("article", "card");
+  card.dataset.workKey = workKey(w);
+
+  // ① メディア
+  const mediaWrap = el("div", "card-media-wrap");
+  mediaWrap.appendChild(createMediaEl(w.media, w.title, "card-media"));
+  mediaWrap.style.cursor = "pointer";
+  mediaWrap.addEventListener("click", () => openPlayArea(w));
+  card.appendChild(mediaWrap);
+
+  const body = el("div", "card-body");
+
+  // ② タイトル・制作期間・タグ・概要
+  const intro = el("div", "block block-desc");
+  intro.appendChild(el("h3", "card-title", w.title));
+  if (w.dev_period) intro.appendChild(el("p", "card-period", w.dev_period));
+  if (Array.isArray(w.tags) && w.tags.length) {
+    const tags = el("div", "tags");
+    w.tags.forEach((t) => tags.appendChild(el("span", "tag", t)));
+    intro.appendChild(tags);
+  }
+  if (w.description) intro.appendChild(el("p", "block-text", w.description));
+  body.appendChild(intro);
+
+  // ③ 担当箇所
+  const role = el("div", "block block-role");
+  role.appendChild(el("h4", "block-label", "担当箇所"));
+  role.appendChild(el("p", "block-text", w.role || ""));
+  body.appendChild(role);
+
+  // プレイ・詳細展開ボタン
+  const actionBar = el("div", "card-action-bar");
+  const detailBtn = el(
+    "button",
+    "card-play-btn",
+    w.webgl_url ? "▶ プレイ・技術解説を見る" : "▶ 作品・技術解説を見る"
+  );
+  detailBtn.type = "button";
+  detailBtn.addEventListener("click", () => openPlayArea(w));
+  actionBar.appendChild(detailBtn);
+  body.appendChild(actionBar);
+
+  if (isAdmin && w.id) body.appendChild(buildAdminBar(w));
+
+  card.appendChild(body);
+  return card;
+}
+
+function buildCompactCard(w, isAdmin) {
+  const card = el("article", "card card-compact");
+  card.dataset.workKey = workKey(w);
+  card.tabIndex = 0;
+  card.setAttribute("role", "button");
+  card.setAttribute("aria-label", `${w.title || "作品"} の詳細を開く`);
+  card.addEventListener("click", () => openPlayArea(w));
+  card.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      openPlayArea(w);
+    }
+  });
+
+  // サムネイル（WebGLありならバッジ表示）
+  const mediaWrap = el("div", "card-media-wrap");
+  mediaWrap.appendChild(createMediaEl(w.media, w.title, "card-media"));
+  if (w.webgl_url) {
+    mediaWrap.appendChild(el("span", "other-card-badge", "▶ PLAY"));
+  }
+  card.appendChild(mediaWrap);
+
+  const body = el("div", "card-body");
+
+  // タイトル・制作期間・技術タグのみに絞って表示
+  const intro = el("div", "block block-desc");
+  intro.appendChild(el("h3", "card-title", w.title));
+  if (w.dev_period) intro.appendChild(el("p", "card-period", w.dev_period));
+  if (Array.isArray(w.tags) && w.tags.length) {
+    const tags = el("div", "tags");
+    w.tags.forEach((t) => tags.appendChild(el("span", "tag", t)));
+    intro.appendChild(tags);
+  }
+  body.appendChild(intro);
+
+  if (isAdmin && w.id) body.appendChild(buildAdminBar(w));
+
+  card.appendChild(body);
+  return card;
+}
+
 function renderWorks() {
-  const grid = document.getElementById("worksGrid");
-  grid.innerHTML = "";
+  const container = document.getElementById("worksSections");
+  container.innerHTML = "";
   const isAdmin = Boolean(currentUser);
 
   const filtered =
@@ -367,63 +499,37 @@ function renderWorks() {
           (w) => Array.isArray(w.tags) && w.tags.includes(activeTag)
         );
 
-  filtered.forEach((w) => {
-    const card = el("article", "card");
-    card.dataset.workKey = workKey(w);
+  let renderedAny = false;
 
-    // ① メディア（動画は自動再生ループ、画像は通常表示）
-    card.appendChild(createMediaEl(w.media, w.title, "card-media"));
+  CATEGORIES.forEach((cat) => {
+    const items = filtered.filter((w) => normalizeCategory(w.category) === cat.key);
+    if (items.length === 0) return;
 
-    const body = el("div", "card-body");
+    renderedAny = true;
+    const sec = el("div", "category-section");
+    sec.id = `category-${cat.key}`;
 
-    // ② タイトル・タグ・ゲームの説明
-    const intro = el("div", "block block-desc");
-    intro.appendChild(el("h3", "card-title", w.title));
-    if (Array.isArray(w.tags) && w.tags.length) {
-      const tags = el("div", "tags");
-      w.tags.forEach((t) => tags.appendChild(el("span", "tag", t)));
-      intro.appendChild(tags);
-    }
-    if (w.description) intro.appendChild(el("p", "block-text", w.description));
-    body.appendChild(intro);
+    const head = el("div", "category-head");
+    const title = el("h3", "category-title");
+    title.appendChild(document.createTextNode(cat.title));
+    title.appendChild(el("span", "category-sub", cat.sub));
+    head.appendChild(title);
+    head.appendChild(el("span", "category-count", `${items.length}件`));
+    sec.appendChild(head);
 
-    // ③ 担当箇所（一覧では長文の「担当箇所の解説」は非表示にしてスリム化）
-    const role = el("div", "block block-role");
-    role.appendChild(el("h4", "block-label", "担当箇所"));
-    role.appendChild(el("p", "block-text", w.role || ""));
-    body.appendChild(role);
-
-    // プレイ・詳細展開ボタン
-    const actionBar = el("div", "card-action-bar");
-    const detailBtn = el(
-      "button",
-      "card-play-btn",
-      w.webgl_url ? "▶ プレイ・技術解説を見る" : "▶ 作品・技術解説を見る"
-    );
-    detailBtn.type = "button";
-    detailBtn.addEventListener("click", () => openPlayArea(w));
-    actionBar.appendChild(detailBtn);
-    body.appendChild(actionBar);
-
-    // 管理者ログイン時のみ 編集・削除バーを表示
-    if (isAdmin && w.id) {
-      const bar = el("div", "card-admin-bar");
-      const editBtn = el("button", "btn-secondary", "編集");
-      editBtn.type = "button";
-      editBtn.addEventListener("click", () => openWorkModal(w));
-
-      const delBtn = el("button", "btn-danger", "削除");
-      delBtn.type = "button";
-      delBtn.addEventListener("click", () => deleteWork(w));
-
-      bar.appendChild(editBtn);
-      bar.appendChild(delBtn);
-      body.appendChild(bar);
-    }
-
-    card.appendChild(body);
-    grid.appendChild(card);
+    const grid = el("div", cat.compact ? "works-grid-compact" : "works-grid");
+    items.forEach((w) => {
+      grid.appendChild(cat.compact ? buildCompactCard(w, isAdmin) : buildMainCard(w, isAdmin));
+    });
+    sec.appendChild(grid);
+    container.appendChild(sec);
   });
+
+  if (!renderedAny) {
+    container.appendChild(
+      el("p", "works-empty", "該当する作品がありません。")
+    );
+  }
 }
 
 /* ---------- Supabase データ取得・認証・CRUD ---------- */
@@ -478,6 +584,8 @@ function openWorkModal(work = null) {
     document.getElementById("workModalTitle").textContent = "作品を編集";
     document.getElementById("workId").value = work.id;
     document.getElementById("workTitle").value = work.title || "";
+    document.getElementById("workCategory").value = normalizeCategory(work.category);
+    document.getElementById("workDevPeriod").value = work.dev_period || "";
     document.getElementById("workMediaUrl").value = work.media || "";
     document.getElementById("workWebglUrl").value = work.webgl_url || "";
     document.getElementById("workDescription").value = work.description || "";
@@ -536,6 +644,8 @@ async function handleSaveWork(e) {
 
     const payload = {
       title: document.getElementById("workTitle").value.trim(),
+      category: document.getElementById("workCategory").value || "main",
+      dev_period: document.getElementById("workDevPeriod").value.trim(),
       media,
       webgl_url: document.getElementById("workWebglUrl").value.trim(),
       description: document.getElementById("workDescription").value.trim(),

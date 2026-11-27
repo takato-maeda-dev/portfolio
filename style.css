@@ -186,17 +186,52 @@ kbd {
   box-shadow: 0 2px 8px rgba(37, 99, 235, .25);
 }
 
-/* ===== Works cards ===== */
+/* ===== Works sections & cards ===== */
+.works-sections { display: flex; flex-direction: column; gap: 3rem; }
+.category-section { display: flex; flex-direction: column; gap: 1.1rem; }
+.category-head {
+  display: flex; align-items: baseline; justify-content: space-between; gap: .8rem; flex-wrap: wrap;
+  padding-bottom: .55rem; border-bottom: 1px solid var(--line);
+}
+.category-title {
+  font-family: var(--font-mono); font-size: 1.15rem; color: var(--heading);
+  display: flex; align-items: baseline; gap: .6rem; flex-wrap: wrap;
+}
+.category-sub { font-family: var(--font-body); font-size: .82rem; font-weight: 500; color: var(--muted); }
+.category-count {
+  font-family: var(--font-mono); font-size: .78rem; color: var(--muted);
+  background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: .1rem .65rem;
+}
+.works-empty { text-align: center; color: var(--muted); padding: 2.5rem 1rem; font-size: .95rem; }
+
 .works-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 1.5rem; }
+.works-grid-compact { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 1.2rem; }
+
 .card {
   background: var(--card); border: 1px solid var(--line); border-radius: 14px;
   overflow: hidden; display: flex; flex-direction: column;
   box-shadow: var(--shadow); transition: .25s;
 }
 .card:hover { border-color: var(--accent-line); transform: translateY(-3px); box-shadow: var(--shadow-hover); }
-.card-media { aspect-ratio: 16 / 9; width: 100%; object-fit: cover; background: var(--line); display: block; }
+.card-media-wrap { position: relative; aspect-ratio: 16 / 9; width: 100%; background: var(--line); overflow: hidden; }
+.card-media { aspect-ratio: 16 / 9; width: 100%; height: 100%; object-fit: cover; background: var(--line); display: block; }
 .card-body { display: flex; flex-direction: column; flex: 1; }
-.card-title { font-size: 1.2rem; margin-bottom: .4rem; }
+.card-title { font-size: 1.2rem; margin-bottom: .3rem; }
+.card-period, .detail-period {
+  font-family: var(--font-mono); font-size: .78rem; font-weight: 500; color: var(--muted);
+  margin-bottom: .45rem;
+}
+.detail-period { color: var(--accent); margin-bottom: .5rem; }
+
+/* Compact cards (Tech Demos / Rapid Prototypes) */
+.card-compact { cursor: pointer; }
+.card-compact:hover { border-color: var(--accent); }
+.card-compact .block-desc { padding: .95rem 1.1rem 1.1rem; border-top: 1px solid var(--line); flex: 1; display: flex; flex-direction: column; }
+.card-compact .card-title { font-size: 1.02rem; line-height: 1.4; margin-bottom: .25rem; }
+.card-compact .card-period { font-size: .74rem; margin-bottom: .45rem; }
+.card-compact .tags { margin: auto 0 0; padding-top: .35rem; gap: .35rem; }
+.card-compact .tag { font-size: .72rem; padding: .02rem .55rem; }
+.card-compact .card-admin-bar { padding: .5rem 1rem; }
 
 /* 3ブロック: 説明(白) / 担当(青系) / 解説(グレー) を背景色と区切り線で区別 */
 .block { padding: 1rem 1.4rem; border-top: 1px solid var(--line); }
@@ -287,13 +322,20 @@ kbd {
 }
 .modal-close:hover { color: var(--heading); }
 .modal-form { padding: 1.5rem 1.8rem 1.8rem; display: flex; flex-direction: column; gap: 1.25rem; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+@media (max-width: 600px) { .field-row { grid-template-columns: 1fr; } }
 .field { display: flex; flex-direction: column; gap: .45rem; font-size: .9rem; font-weight: 600; color: var(--heading); }
 .field input[type="text"],
 .field input[type="email"],
 .field input[type="password"],
+.field select,
 .field textarea {
   width: 100%; padding: .65rem .85rem; border: 1px solid var(--line); border-radius: 8px;
   font-family: var(--font-body); font-size: .94rem; line-height: 1.65; color: var(--heading); background: var(--bg);
+}
+.field select:focus {
+  outline: none; border-color: var(--accent); background: #fff;
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 .field textarea { resize: vertical; }
 #workDescription, #workRole { min-height: 6.5rem; }
